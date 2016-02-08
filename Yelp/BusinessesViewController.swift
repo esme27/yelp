@@ -8,15 +8,17 @@
 
 import UIKit
 
-class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating {
+class BusinessesViewController: UIViewController, UITableViewDataSource, UITableViewDelegate, UISearchResultsUpdating, UIScrollViewDelegate {
 
     var businesses: [Business]!
-    var data: [Business]!
+    var filteredData: [Business]!
+    var searchController: UISearchController!
+    var isMoreDataLoading = false
     
     
     @IBOutlet weak var tableView: UITableView!
    
-    var searchController: UISearchController!
+    
     
     
     override func viewDidLoad() {
@@ -28,6 +30,7 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         tableView.rowHeight = UITableViewAutomaticDimension
         tableView.estimatedRowHeight = 120
         
+       
         searchController = UISearchController(searchResultsController: nil)
         searchController.searchResultsUpdater = self
         searchController.searchBar.sizeToFit()
@@ -47,6 +50,9 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
             for business in businesses {
                 print(business.name!)
                 print(business.address!)
+                print(business.distance!)
+                print(business.categories!)
+                
             }
         })
         
@@ -61,6 +67,8 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
         }
 */
     }
+    
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -92,12 +100,12 @@ class BusinessesViewController: UIViewController, UITableViewDataSource, UITable
     
     
     func updateSearchResultsForSearchController(searchController: UISearchController) {
-        if data == nil {
-            data = businesses
+        if filteredData == nil {
+            filteredData = businesses
         }
         if let searchText = searchController.searchBar.text {
             if(searchText == "") {
-                businesses = data
+                businesses = filteredData
                 tableView.reloadData()
             } else {
                 businesses = searchText.isEmpty ? businesses : businesses?.filter({ (business:Business) -> Bool in
